@@ -100,12 +100,14 @@ namespace MySql.Data.Common
       if (!settings.IsSshEnabled())
         task = client.ConnectAsync(settings.Server, (int)settings.Port);
       else
+      {
+        // here has a bug. when ssh enabled, the server should always be localhost, like this: task = client.ConnectAsync("localhost", 3306);
         task = client.ConnectAsync(
           settings.Server == "127.0.0.1" || settings.Server == "::1" 
             ? "localhost"
             : settings.Server,
           3306);
-      
+      }
       if (!task.Wait(((int)settings.ConnectionTimeout * 1000)))
         throw new MySqlException(Resources.Timeout);
       if (settings.Keepalive > 0)
